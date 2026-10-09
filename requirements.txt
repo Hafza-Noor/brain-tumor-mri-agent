@@ -4,7 +4,7 @@ numpy<2.0.0
 pillow
 opencv-python-headless
 torchcam
-crewai
+crewai==0.100.0
 langchain-groq
 langchain-community
 faiss-cpu
