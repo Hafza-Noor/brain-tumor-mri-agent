@@ -1,11 +1,9 @@
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.2.2+cpu
-torchvision==0.17.2+cpu
+torch
+torchvision
 numpy<2.0.0
 pillow
 opencv-python-headless
 torchcam
-crewai==0.100.0
 langchain-groq
 langchain-community
 faiss-cpu
