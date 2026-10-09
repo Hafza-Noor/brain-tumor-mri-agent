@@ -1,6 +1,6 @@
 import streamlit as st
 from PIL import Image
-from crewai import Agent, Task, Crew, LLM
+from langchain_groq import ChatGroq
 
 from tools.classifier_tool import predict_mri
 from tools.gradcam_tool import generate_gradcam
@@ -69,25 +69,18 @@ with tab1:
             if not groq_key:
                 st.error("Missing GROQ_API_KEY in Streamlit secrets.")
             else:
-                groq_llm = LLM(model="groq/openai/gpt-oss-120b", api_key=groq_key)
+                llm = ChatGroq(groq_api_key=groq_key, model_name="openai/gpt-oss-120b")
                 
-                report_agent = Agent(
-                    role="Medical Communicator",
-                    goal="Translate PyTorch outputs into clear, educational non-diagnostic descriptions.",
-                    backstory="You summarize neural network findings using reference knowledge. You NEVER diagnose directly.",
-                    llm=groq_llm
+                prompt = (
+                    f"You are an AI Medical Communicator. Synthesize the following findings into a clean, educational markdown summary.\n"
+                    f"Prediction: {res['pred_results']['top_prediction']} ({res['pred_results']['confidence']*100:.2f}% confidence).\n"
+                    f"Medical Context: {res['retrieved_context']}\n"
+                    f"Note: Remind the user this is for educational research only."
                 )
                 
-                report_task = Task(
-                    description=f"Synthesize output: {res['pred_results']['top_prediction']} ({res['pred_results']['confidence']*100:.2f}%). Context: {res['retrieved_context']}",
-                    expected_output="Clean markdown summary.",
-                    agent=report_agent
-                )
-                
-                crew = Crew(agents=[report_agent], tasks=[report_task])
                 with st.spinner("Generating agent explanation..."):
-                    agent_report = crew.kickoff()
-                    st.markdown(agent_report.raw)
+                    agent_report = llm.invoke(prompt)
+                    st.markdown(agent_report.content)
 
 with tab2:
     st.header("💬 Follow-up Chat")
@@ -103,24 +96,16 @@ with tab2:
         groq_key = st.secrets.get("GROQ_API_KEY", "")
         if groq_key and st.session_state.latest_results is not None:
             res = st.session_state.latest_results
-            chat_llm = LLM(model="groq/openai/gpt-oss-120b", api_key=groq_key)
+            llm = ChatGroq(groq_api_key=groq_key, model_name="openai/gpt-oss-120b")
             
-            chat_agent = Agent(
-                role="Knowledge Assistant",
-                goal="Answer questions based on MRI findings.",
-                backstory="Helpful AI tutor.",
-                llm=chat_llm
+            prompt = (
+                f"Context: The scan top prediction is {res['pred_results']['top_prediction']}.\n"
+                f"User Question: {user_query}\n"
+                f"Provide a concise, educational response."
             )
             
-            chat_task = Task(
-                description=f"Context: {res['pred_results']['top_prediction']}. Question: {user_query}",
-                expected_output="Concise educational answer.",
-                agent=chat_agent
-            )
-            
-            chat_crew = Crew(agents=[chat_agent], tasks=[chat_task])
             with st.chat_message("assistant"):
-                reply = chat_crew.kickoff().raw
+                reply = llm.invoke(prompt).content
                 st.markdown(reply)
                 st.session_state.chat_history.append({"role": "assistant", "content": reply})
 
