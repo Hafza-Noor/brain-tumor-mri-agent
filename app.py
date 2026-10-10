@@ -71,13 +71,14 @@ with tab1:
             else:
                 llm = ChatGroq(groq_api_key=groq_key, model_name="openai/gpt-oss-120b")
                 
-                prompt = (
-                    f"You are an AI Medical Communicator. Synthesize the following findings into a clean, educational markdown summary.\n"
+         prompt = (
+                    f"You are an AI Medical Communicator. Write a short, educational markdown summary of the findings below.\n"
                     f"Prediction: {res['pred_results']['top_prediction']} ({res['pred_results']['confidence']*100:.2f}% confidence).\n"
                     f"Medical Context: {res['retrieved_context']}\n"
-                    f"Note: Remind the user this is for educational research only."
+                    f"Rules: Use only the information given. Do not speculate about software errors. "
+                    f"If confidence is below {confidence_threshold*100:.0f}%, say clearly that the result is uncertain and should not be relied on. "
+                    f"Remind the user this is for educational research only."
                 )
-                
                 with st.spinner("Generating agent explanation..."):
                     agent_report = llm.invoke(prompt)
                     st.markdown(agent_report.content)
