@@ -65,7 +65,7 @@ with tab1:
             st.markdown("---")
             st.subheader("🤖 Synthesized Agent Report")
             
-                        groq_key = st.secrets.get("GROQ_API_KEY", "")
+            groq_key = st.secrets.get("GROQ_API_KEY", "")
             if not groq_key:
                 st.error("Missing GROQ_API_KEY in Streamlit secrets.")
             else:
