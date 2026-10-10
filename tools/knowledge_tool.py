@@ -24,7 +24,7 @@ def _get_vector_db():
 
     loader = TextLoader(knowledge_path)
     documents = loader.load()
-    text_splitter = CharacterTextSplitter(chunk_size=300, chunk_overlap=50)
+    ttext_splitter = CharacterTextSplitter(separator="\n", chunk_size=300, chunk_overlap=50)
     docs = text_splitter.split_documents(documents)
 
     embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
