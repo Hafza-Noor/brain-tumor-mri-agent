@@ -20,7 +20,7 @@ def generate_gradcam(pil_image: Image.Image) -> Image.Image:
         class_index = int(outputs.argmax(dim=1).item())
 
         activation_map = cam_extractor(class_index, outputs)[0]
-        heatmap = activation_map.detach().cpu().numpy()
+        heatmap = activation_map.squeeze(0).detach().cpu().numpy()
         heatmap = cv2.resize(heatmap, (IMG_SIZE, IMG_SIZE))
 
         heatmap = np.uint8(
