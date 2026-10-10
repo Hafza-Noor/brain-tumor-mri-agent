@@ -65,13 +65,13 @@ with tab1:
             st.markdown("---")
             st.subheader("🤖 Synthesized Agent Report")
             
-            groq_key = st.secrets.get("GROQ_API_KEY", "")
+                        groq_key = st.secrets.get("GROQ_API_KEY", "")
             if not groq_key:
                 st.error("Missing GROQ_API_KEY in Streamlit secrets.")
             else:
                 llm = ChatGroq(groq_api_key=groq_key, model_name="openai/gpt-oss-120b")
-                
-         prompt = (
+
+                prompt = (
                     f"You are an AI Medical Communicator. Write a short, educational markdown summary of the findings below.\n"
                     f"Prediction: {res['pred_results']['top_prediction']} ({res['pred_results']['confidence']*100:.2f}% confidence).\n"
                     f"Medical Context: {res['retrieved_context']}\n"
@@ -79,6 +79,7 @@ with tab1:
                     f"If confidence is below {confidence_threshold*100:.0f}%, say clearly that the result is uncertain and should not be relied on. "
                     f"Remind the user this is for educational research only."
                 )
+
                 with st.spinner("Generating agent explanation..."):
                     agent_report = llm.invoke(prompt)
                     st.markdown(agent_report.content)
