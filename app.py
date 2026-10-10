@@ -81,7 +81,6 @@ with tab1:
                 with st.spinner("Generating agent explanation..."):
                     agent_report = llm.invoke(prompt)
                     st.markdown(agent_report.content)
-
 with tab2:
     st.header("💬 Follow-up Chat")
     for msg in st.session_state.chat_history:
@@ -108,7 +107,8 @@ with tab2:
                 reply = llm.invoke(prompt).content
                 st.markdown(reply)
                 st.session_state.chat_history.append({"role": "assistant", "content": reply})
-
+        else:
+            st.warning("Please run a scan analysis first (and make sure GROQ_API_KEY is set).")
 with tab3:
     st.header("📋 Pending Escalations")
     if not st.session_state.escalated_cases:
